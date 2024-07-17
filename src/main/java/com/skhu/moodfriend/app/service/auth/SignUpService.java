@@ -63,7 +63,6 @@ public class SignUpService {
         );
 
         String accessToken = tokenProvider.createAccessToken(member);
-
         String refreshToken = tokenProvider.createRefreshToken(member);
 
         MemberRefreshToken memberRefreshToken = new MemberRefreshToken();

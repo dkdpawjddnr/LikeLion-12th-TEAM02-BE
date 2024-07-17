@@ -1,9 +1,11 @@
 package com.skhu.moodfriend.app.controller.auth;
 
+import com.skhu.moodfriend.app.dto.auth.GoogleAccessToken;
 import com.skhu.moodfriend.app.dto.auth.reqDto.LoginReqDto;
 import com.skhu.moodfriend.app.dto.auth.reqDto.SignUpReqDto;
 import com.skhu.moodfriend.app.dto.auth.resDto.LoginResDto;
 import com.skhu.moodfriend.app.dto.auth.resDto.SignUpResDto;
+import com.skhu.moodfriend.app.service.auth.AuthLoginService;
 import com.skhu.moodfriend.app.service.auth.LoginService;
 import com.skhu.moodfriend.app.service.auth.SignUpService;
 import com.skhu.moodfriend.global.template.ApiResponseTemplate;
@@ -13,10 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,6 +25,7 @@ public class AuthController {
 
     private final SignUpService signUpService;
     private final LoginService loginService;
+    private final AuthLoginService authLoginService;
 
     @PostMapping("/signUp")
     @Operation(
@@ -58,4 +58,16 @@ public class AuthController {
         ApiResponseTemplate<LoginResDto> data = loginService.login(loginReqDto);
         return ResponseEntity.status(data.getStatus()).body(data);
     }
+
+    @GetMapping("/code/google")
+    public GoogleAccessToken googleCallback(@RequestParam(name = "code") String code) {
+        String googleAccessToken = authLoginService.getGoogleAccessToken(code);
+        return loginOrSignup(googleAccessToken);
+    }
+
+    public GoogleAccessToken loginOrSignup(String googleAccessToken) {
+        return authLoginService.loginOrSignUp(googleAccessToken);
+    }
+
+
 }

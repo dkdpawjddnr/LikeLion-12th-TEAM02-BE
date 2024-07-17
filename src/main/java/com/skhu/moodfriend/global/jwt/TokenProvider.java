@@ -1,5 +1,6 @@
 package com.skhu.moodfriend.global.jwt;
 
+import com.skhu.moodfriend.app.dto.auth.GoogleAccessToken;
 import com.skhu.moodfriend.app.entity.member.Member;
 import com.skhu.moodfriend.global.exception.code.ErrorCode;
 import com.skhu.moodfriend.global.exception.CustomException;
@@ -12,6 +13,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,6 +44,7 @@ public class TokenProvider {
         this.refreshTokenValidityTime = refreshTokenValidityTime;
     }
 
+
     public String createRefreshToken(Member member) {
         long nowTime = (new Date().getTime());
 
@@ -56,6 +59,7 @@ public class TokenProvider {
                 .compact();
     }
 
+    /*
     public String createAccessToken(Member member) {
         long nowTime = (new Date().getTime());
 
@@ -67,6 +71,22 @@ public class TokenProvider {
                 .setExpiration(accessTokenExpiredTime)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+    */
+
+    //추가
+    public GoogleAccessToken createAccessToken(Member member) {
+        long nowTime = new Date().getTime();
+        Date accessTokenExpiredTime = new Date(nowTime + accessTokenValidityTime);
+
+        String accessToken = Jwts.builder()
+                .setSubject(member.getMemberId().toString())
+                .claim("Role", member.getRoleType().getCode())
+                .setExpiration(accessTokenExpiredTime)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return new GoogleAccessToken(accessToken);
     }
 
     private Claims parseClaims(String accessToken) {
