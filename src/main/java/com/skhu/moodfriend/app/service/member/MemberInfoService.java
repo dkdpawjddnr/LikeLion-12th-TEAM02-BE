@@ -23,10 +23,11 @@ public class MemberInfoService {
 
     @Transactional(readOnly = true)
     public ApiResponseTemplate<MemberInfoResDto> getMemberInfo(Principal principal) {
+
         Long memberId = Long.parseLong(principal.getName());
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ID_EXCEPTION, ErrorCode.NOT_FOUND_USER_EXCEPTION.getMessage()));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION, ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
 
         MemberInfoResDto resDto = MemberInfoResDto.builder()
                 .email(member.getEmail())
@@ -39,11 +40,13 @@ public class MemberInfoService {
     }
 
     @Transactional
-    public ApiResponseTemplate<MemberInfoResDto> updateMemberInfo(Principal principal, MemberInfoUpdateReqDto reqDto) {
+    public ApiResponseTemplate<MemberInfoResDto> updateMemberInfo(
+            MemberInfoUpdateReqDto reqDto, Principal principal) {
+
         Long memberId = Long.parseLong(principal.getName());
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ID_EXCEPTION, ErrorCode.NOT_FOUND_ID_EXCEPTION.getMessage()));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER_EXCEPTION, ErrorCode.NOT_FOUND_MEMBER_EXCEPTION.getMessage()));
 
         member.updateInfo(reqDto.name());
 
